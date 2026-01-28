@@ -1,6 +1,7 @@
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { supabase } from "../supabase";
 
 export default function CreatePost() {
   const router = useRouter();
@@ -19,7 +20,29 @@ export default function CreatePost() {
         onChangeText={setText}
       />
 
-      <Pressable style={styles.button} onPress={() => router.back()}>
+      <Pressable
+        style={styles.button}
+        onPress={async () => {
+          const { data } = await supabase.auth.getUser();
+
+          if (!data.user) {
+            alert("You must be logged in");
+            return;
+          }
+
+          const { error } = await supabase.from("posts").insert({
+            content: text,
+            user_id: data.user.id,
+            user_email: data.user.email,
+          });
+
+          if (error) {
+            alert(error.message);
+          } else {
+            router.back();
+          }
+        }}
+      >
         <Text style={styles.buttonText}>Post</Text>
       </Pressable>
     </View>
