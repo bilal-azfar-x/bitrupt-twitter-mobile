@@ -31,7 +31,7 @@ export default function Feed() {
         } else {
           fetchPosts();
         }
-      }
+      },
     );
 
     return () => {
@@ -55,11 +55,13 @@ export default function Feed() {
 
   return (
     <View style={styles.container}>
-      <Pressable style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutText}>Logout</Text>
-      </Pressable>
+      <View style={styles.header}>
+        <Text style={styles.title}>Feed</Text>
 
-      <Text style={styles.title}>Feed</Text>
+        <Pressable onPress={handleLogout}>
+          <Text style={styles.logoutText}>Logout</Text>
+        </Pressable>
+      </View>
 
       <ScrollView>
         {posts.length === 0 && (
@@ -97,6 +99,12 @@ const styles = StyleSheet.create({
     color: "#1da1f2",
     fontWeight: "bold",
   },
+  header: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: 16,
+},
   title: {
     color: "#fff",
     fontSize: 24,
