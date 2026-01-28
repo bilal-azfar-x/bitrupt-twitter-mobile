@@ -1,18 +1,45 @@
 import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { supabase } from "../supabase";
 
 export default function Feed() {
   const router = useRouter();
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    async function init() {
+      const { data: sessionData } = await supabase.auth.getSession();
+
+      if (!sessionData.session) {
+        router.replace("/");
+        return;
+      }
+
+      const { data } = await supabase
+        .from("posts")
+        .select("id, user_email, content, created_at")
+        .order("created_at", { ascending: false });
+
+      if (data) setPosts(data);
+    }
+
+    init();
+  }, []);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Feed</Text>
 
       <ScrollView>
-        <View style={styles.post}>
-          <Text style={styles.user}>@user</Text>
-          <Text style={styles.content}>Hello from the mobile app 👋</Text>
-        </View>
+        {posts.map((post) => (
+          <View key={post.id} style={styles.post}>
+            <Text style={styles.user}>
+              @{post.user_email?.split("@")[0] || "anonymous"}
+            </Text>
+            <Text style={styles.content}>{post.content}</Text>
+          </View>
+        ))}
       </ScrollView>
 
       <Pressable style={styles.fab} onPress={() => router.push("/create-post")}>
