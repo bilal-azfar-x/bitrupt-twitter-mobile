@@ -68,7 +68,7 @@ export default function CreatePost() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#000", padding: 24 },
-  title: { color: "#fff", fontSize: 24, marginBottom: 16, fontWeight: "bold" },
+  title: { color: "#fff", fontSize: 24, marginBottom: 16, fontWeight: "bold", marginTop: 40 },
   input: {
     borderWidth: 1,
     borderColor: "#2f3336",

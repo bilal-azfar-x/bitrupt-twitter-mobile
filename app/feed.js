@@ -98,12 +98,14 @@ const styles = StyleSheet.create({
   logoutText: {
     color: "#1da1f2",
     fontWeight: "bold",
+    marginBottom: 16
   },
   header: {
   flexDirection: "row",
   justifyContent: "space-between",
   alignItems: "center",
   marginBottom: 16,
+  marginTop: 40
 },
   title: {
     color: "#fff",
