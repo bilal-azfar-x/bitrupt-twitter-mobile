@@ -1,6 +1,7 @@
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { supabase } from "../supabase";
 
 export default function Login() {
   const router = useRouter();
@@ -28,9 +29,24 @@ export default function Login() {
         onChangeText={setPassword}
       />
 
-      <Pressable style={styles.button} onPress={() => router.push("/feed")}>
-        <Text style={styles.buttonText}>Login</Text>
-      </Pressable>
+      <Pressable
+  style={styles.button}
+  onPress={async () => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      alert(error.message);
+    } else {
+      router.replace("/feed");
+    }
+  }}
+>
+  <Text style={styles.buttonText}>Login</Text>
+</Pressable>
+
 
       <Pressable onPress={() => router.push("/signup")}>
         <Text style={styles.link}>Don’t have an account? Sign up</Text>
