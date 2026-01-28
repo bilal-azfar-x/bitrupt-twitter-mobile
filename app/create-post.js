@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import { View, Text, TextInput, Pressable, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { supabase } from "../supabase";
@@ -6,6 +6,39 @@ import { supabase } from "../supabase";
 export default function CreatePost() {
   const router = useRouter();
   const [text, setText] = useState("");
+
+  async function handlePost() {
+    const cleanedText = text.trim();
+
+    if (cleanedText.length === 0) {
+      Alert.alert("Post cannot be empty");
+      return;
+    }
+
+    if (cleanedText.length > 280) {
+      Alert.alert("Post must be 280 characters or less");
+      return;
+    }
+
+    const { data } = await supabase.auth.getUser();
+
+    if (!data.user) {
+      Alert.alert("You must be logged in");
+      return;
+    }
+
+    const { error } = await supabase.from("posts").insert({
+      content: cleanedText,
+      user_id: data.user.id,
+      user_email: data.user.email,
+    });
+
+    if (error) {
+      Alert.alert(error.message);
+    } else {
+      router.back();
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -18,36 +51,20 @@ export default function CreatePost() {
         multiline
         value={text}
         onChangeText={setText}
+        maxLength={280}
       />
 
-      <Pressable
-        style={styles.button}
-        onPress={async () => {
-          const { data } = await supabase.auth.getUser();
+      <Text style={{ color: "#8899a6", marginBottom: 12 }}>
+        {text.trim().length}/280
+      </Text>
 
-          if (!data.user) {
-            alert("You must be logged in");
-            return;
-          }
-
-          const { error } = await supabase.from("posts").insert({
-            content: text,
-            user_id: data.user.id,
-            user_email: data.user.email,
-          });
-
-          if (error) {
-            alert(error.message);
-          } else {
-            router.back();
-          }
-        }}
-      >
+      <Pressable style={styles.button} onPress={handlePost}>
         <Text style={styles.buttonText}>Post</Text>
       </Pressable>
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#000", padding: 24 },
